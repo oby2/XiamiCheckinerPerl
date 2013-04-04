@@ -1,7 +1,12 @@
 use strict;
 use warnings;
 
-package XiamiCheckinerPerl::Sample::ObjectAndClass::Animal;
+package Sample::ObjectAndClass::Animal;
+
+sub new {
+    my $class = shift @_;
+    return bless { "legs" => 4, "colour" => "brown" }, $class;
+}
 
 sub eat {
     # First argument is always the object to act upon.
