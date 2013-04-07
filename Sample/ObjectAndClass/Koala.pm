@@ -1,7 +1,7 @@
+package Sample::ObjectAndClass::Koala;
+
 use strict;
 use warnings;
-
-package Sample::ObjectAndClass::Koala;
 
 # Inherit from Animal
 use parent ("Sample::ObjectAndClass::Animal");

@@ -1,7 +1,7 @@
+package Sample::ObjectAndClass::Animal;
+
 use strict;
 use warnings;
-
-package Sample::ObjectAndClass::Animal;
 
 sub new {
     my $class = shift @_;
