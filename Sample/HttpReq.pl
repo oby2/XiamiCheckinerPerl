@@ -27,32 +27,26 @@
 
 use strict;
 use warnings;
-use LWP;
-use Data::Dumper;
+use LWP ();
 
-my $url = 'http://www.xiami.com/member/login';
+my $url = 'http://www.xiami.com/web/login';
 my $browser = LWP::UserAgent->new;
 
 my $response = $browser->post($url,
     [
-        'done' => '%2F',
-        'email' => '1141120074@qq.com',
+        'email' => '1141120074%40qq.com',
         'password' => 's1987s05w19',
-        'submit' => '%E7%99%BB+%E5%BD%95'
+        'LoginButton' => '%E7%99%BB+%E5%BD%95'
     ],
 );
 
 print($response->code);
 print($response->message);
-print("\n");
-print($response->content);
-my $f = "login_response.html";
 
-$response = $browser->get('http://www.xiami.com');
-print($response->code);
-print($response->message);
+
+my $f = "login_response.html";
 print("\n");
-print($response->content);
+print($response->headers_as_string);
 open(my $fh, ">", $f) || die "Couldn't open '".$f."' for writing because: ".$!;
-print $fh $response->content;
+print $fh $response->as_string;
 close $fh;
