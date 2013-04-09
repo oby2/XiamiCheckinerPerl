@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 require Sample::ObjectAndClass::Animal;
-require Sample::Context;
 
 my $animal = {
     "legs"   => 4,
@@ -15,9 +14,18 @@ print ref $animal;       # "Animal"
 print("\n");
 $animal = Sample::ObjectAndClass::Animal->new();
 print ref $animal;
+print("\n");
 
 require Sample::ObjectAndClass::Koala;
 
 my $koala = Sample::ObjectAndClass::Koala->new();
 
 $koala->eat("insects", "curry", "eucalyptus"); # eat only the eucalyptus
+
+print("\n");
+$b = "1" == "2";
+print($b);
+print("\n");
+print(!$b);
+print("\n");
+print(not $b);

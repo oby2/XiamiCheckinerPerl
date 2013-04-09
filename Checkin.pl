@@ -1,47 +1,62 @@
 use strict;
 use warnings;
+use Data::Dumper;
 use LWP ();
 use HTTP::Cookies ();
+
+my $xiami_home_url = 'http://www.xiami.com';
+my $xiami_login_url = $xiami_home_url.'/web/login';
 
 # Create a user agent object
 my $browser = LWP::UserAgent->new;
 $browser->agent("Mozilla/5.0");
+$browser->cookie_jar({});
 
-# Create a request
-my $post_req_to_login_page = HTTP::Request->new(POST => 'http://www.xiami.com/web/login');
-$post_req_to_login_page->content_type('application/x-www-form-urlencoded');
-$post_req_to_login_page->content('email=1141120074%40qq.com&password=s1987s05w19&LoginButton=%E7%99%BB%E5%BD%95');
+# Request #1, POST, login to xiami
+my $request_login = HTTP::Request->new(POST => $xiami_login_url);
+$request_login->content_type('application/x-www-form-urlencoded');
+$request_login->content('email=1141120074%40qq.com&password=s1987s05w19&LoginButton=%E7%99%BB%E5%BD%95');
 
-# Pass request to the user agent and get a response back
-my $response = $browser->request($post_req_to_login_page);
+my $response_login = $browser->request($request_login);
 
 # Check the outcome of the response
-if ($response->is_success)
+die('Login response is not a redirect! Actual status line:'.$response_login->status_line.'.') if !$response_login->is_redirect;
+
+# Request #2, GET, get to where the former response told us to go (something like manual follow-redirect)
+my $request_home_1 = HTTP::Request->new(GET => $xiami_home_url.$response_login->headers->{'location'});
+$response_home_1 = $browser->request($request_home_1);
+
+die('Error when manual follow-redirect to home page after login! Actual status line:'.$response_login->status_line.'.') if !$response_home_1->is_success;
+
+my $checkin_url = undef;
+
+if($response_home_1->content =~ m/<a class="check_in" href="([^"]+)">/)
 {
-    print $response->content;
+    $checkin_url = $1;
 }
 else
 {
-    print $response->status_line, "\n";
+    die("Fail to extract checkin url from home page 1st time response's content!");
 }
 
-my $member_auth_key;
-# Sample member auth key: 6RjemAzHVmHHcfG9w66fqR%2BRIQ50DnFO3xKwg0JcHQ10FrkNm09E7m%2BQpezbzYmtLRm5o9k07dLi5g
+my $request_checkin = HTTP::Request->new(GET => $xiami_home_url.$checkin_url);
+$request_checkin->header(Referer => $xiami_home_url.'/web');
+my $response_checkin = $browser->request($request_checkin);
 
-if($response->headers_as_string =~ m/member_auth=([^\;]+);/)
+die('Checkin response is not a redirect! Actual status line:'.$response_login->status_line.'.') if !$response_login->is_redirect;
+
+$request_home_2 = HTTP::Request->new(GET => 'http://www.xiami.com/'.$response_checkin->headers->{'location'});
+$request_home_2->header(Referer => $xiami_home_url.'/web');
+$response_home_2 = $browser->request($request_home_2);
+
+die('Error when manual follow-redirect to home page after checkin! Actual status line:'.$response_home_2->status_line.'.') if !$response_home_2->is_success;
+
+if($response_home_2->content =~ m/<div class="idh">已连续签到(\d+)天<\/div>/)
 {
-    $member_auth_key = $1;
-    print($member_auth_key);
+    $checkin_days = $1;
+}
+else
+{
 }
 
-my $get_req_to_home_page = HTTP::Request->new(GET => 'http://www.xiami.com/web');
-
-my $cookies = HTTP::Cookies->new();
-$cookies->set_cookie(0, 'member_auth', $member_auth_key, '/', 'www.xiami.com');
-$browser->cookie_jar($cookies);
-my $res = $browser->request($get_req_to_home_page);
-
-my $f = "home_page_response.html";
-open(my $fh, ">", $f) || die "Couldn't open '".$f."' for writing because: ".$!;
-print $fh $res->as_string;
-close $fh;
+__END__
