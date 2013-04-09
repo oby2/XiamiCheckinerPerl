@@ -1,8 +1,25 @@
+package XiamiCheckiner;
+
 use strict;
 use warnings;
-use Data::Dumper;
+use Data::Dumper ();
 use LWP ();
 use HTTP::Cookies ();
+
+sub is_already_checked_in
+{
+    my $self = shift;
+
+    if($self->$response_home_1->content =~ m/<div class="idh">已连续签到(\d+)天<\/div>/)
+    {
+        log("Already checked in!");
+        return 1;
+    }
+    else
+    {
+        return '';
+    }
+}
 
 my $xiami_home_url = 'http://www.xiami.com';
 my $xiami_login_url = $xiami_home_url.'/web/login';
