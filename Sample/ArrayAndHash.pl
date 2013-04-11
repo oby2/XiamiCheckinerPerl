@@ -41,7 +41,7 @@ my %hash = (
 
 # The above raises a warning because the hash was declared using a 7-element list
 
-print $hash{"beer"}."\n";    # "good"
+print $hash{beer}."\n";    # "good"
 print $hash{"bananas"}."\n"; # "green"
 print $hash{"wait"}."\n";    # "yellow";
 print $hash{"eat"}."\n";     # undef, so prints "" and raises a warning
