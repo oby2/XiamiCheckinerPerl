@@ -34,13 +34,14 @@ sub checkin
     # creates 'yyyy-mm-dd hh:mm:ss' string
     $self->_log(sprintf("---------------------%s---------------------", Time::Piece::localtime->strftime('%Y-%m-%d %H:%M:%S')));
     $self->_log('XiamiCheckin process started...');
-    my $login_response = $self->_login_to_xiami();
+    $self->_login_to_xiami();
+    my $home_page_response = $self->_go_to_home_page();
 
-    if(!$self->_is_already_checked_in())
+    if(!$self->_is_already_checked_in($home_page_response))
     {
-        $self->_send_checkin_request($login_response);
+        $self->_send_checkin_request($home_page_response);
 
-        if($self->_is_already_checked_in())
+        if($self->_is_already_checked_in($home_page_response))
         {
             $self->_log('Checkin successful!');
         }
@@ -100,8 +101,8 @@ sub _send_checkin_request
 sub _go_to_home_page
 {
     my $self = shift;
-    my $request_home = HTTP::Request->new(GET => URI->new_abs('/web', $xiami_home_url));
     
+    my $request_home = HTTP::Request->new(GET => URI->new_abs('/web', $xiami_home_url));
     $self->_log('Requesting home page...');
     my $response_home = $self->{'_browser'}->request($request_home);
 
@@ -114,7 +115,7 @@ sub _go_to_home_page
 sub _is_already_checked_in
 {
     my $self = shift;
-    my $response = $self->_go_to_home_page();
+    my $response = shift;
 
     if($response->content() =~ m/<div class="idh">已连续签到(\d+)天<\/div>/)
     {
@@ -125,7 +126,7 @@ sub _is_already_checked_in
     {
         if($response->headers_as_string() =~ m/t_sign_auth=([^\;]+);/)
         {
-            $self->_log(sprintf('Not checked in today yet, already checked in for %s days!'));
+            $self->_log(sprintf('Not checked in today yet, already checked in for %s days!', $1));
         }
         else
         {
@@ -141,7 +142,7 @@ sub _extract_checkin_url
     my $self = shift;
     my $response = shift;
 
-    if(!$self->_is_already_checked_in())
+    if(!$self->_is_already_checked_in($response))
     {
         $self->_log('Extracting checkin url...');
 
