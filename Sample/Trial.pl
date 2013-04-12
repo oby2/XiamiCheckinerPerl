@@ -2,13 +2,28 @@ use strict;
 use warnings;
 
 use URI::Escape ();
+use Time::Piece (); 
 
-my($c, $d) = (5, 'abcd');
-print($c, $d, "\n");
+# my($c, $d) = (5, 'abcd');
+# print($c, $d, "\n");
 
-my $escaped_email = URI::Escape::uri_escape('1141120074@qq.com');
-my $escaped_password = URI::Escape::uri_escape('s1987s05w19');
-print(sprintf("email=%s&password=%s", $escaped_email, $escaped_password).'&LoginButton=%E7%99%BB%E5%BD%95');
+# my $escaped_email = URI::Escape::uri_escape('1141120074@qq.com');
+# my $escaped_password = URI::Escape::uri_escape('s1987s05w19');
+# print(sprintf("email=%s&password=%s", $escaped_email, $escaped_password).'&LoginButton=%E7%99%BB%E5%BD%95');
+
+
+print Time::Piece::localtime->strftime('%Y-%m-%d %H:%M:%S');
+
+my $a = [1, 2, 3];
+shift @$a;
+print(@$a, "\n");
+print join ',', @$a;
+shift @$a;
+print(@$a, "\n");
+shift @$a;
+print(@$a, "\n");
+shift @$a;
+print(@$a, "\n");
 
 __END__
 use Sample::ObjectAndClass::Animal ();
