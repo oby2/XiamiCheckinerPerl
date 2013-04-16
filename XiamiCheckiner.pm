@@ -129,19 +129,16 @@ sub _extract_checkin_url
 {
     my $self = shift;
 
-    if(!$self->_is_already_checked_in())
-    {
-        $self->_log('Extracting checkin url...');
+    $self->_log('Extracting checkin url...');
 
-        if($self->{'_response_home'}->content() =~ m/<a class="check_in" href="([^"]+)">/)
-        {
-            $self->_log('Checkin url obtained.');
-            return $1;
-        }
-        else
-        {
-            $self->_log_and_die("Fail to extract checkin url!");
-        }
+    if($self->{'_response_home'}->content() =~ m/<a class="check_in" href="([^"]+)">/)
+    {
+        $self->_log('Checkin url obtained.');
+        return $1;
+    }
+    else
+    {
+        $self->_log_and_die("Fail to extract checkin url!");
     }
 }
 
