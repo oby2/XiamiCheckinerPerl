@@ -1,11 +1,13 @@
-package XiamiCheckiner;
+package MobileCheckiner;
 
 use strict;
 use warnings;
 use LWP ();
 use HTTP::Cookies ();
 use URI ();
-use Time::Piece (); 
+use Time::Piece ();
+use File::Path ();
+use File::Spec ();
 
 my $xiami_home_url = 'http://www.xiami.com';
 my $xiami_login_url = URI->new_abs('/web/login', $xiami_home_url);
@@ -158,9 +160,16 @@ sub _log
     {
         $f = shift;
     }
+    else
+    {
+        # Print the message to console if logging to log.txt
+        print($msg."\n");
+    }
     
-    open(my $fh, $mode, $f) || die "Couldn't open '".$f."' because: ".$!;
-    #print($msg."\n");
+    my $folder = 'log/MobileCheckiner';
+    File::Path::make_path($folder);
+    my $path = File::Spec->catfile($folder, $f);
+    open(my $fh, $mode, $path) || die "Couldn't open '".$path."' because: ".$!;
     print $fh $msg."\n";
     close $fh;
 }

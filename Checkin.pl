@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use XiamiCheckiner ();
+use MobileCheckiner ();
 
 my $email = shift(@ARGV);
 my $password = shift(@ARGV);
-my $checkiner = XiamiCheckiner->new($email, $password);
+my $checkiner = MobileCheckiner->new($email, $password);
 $checkiner->checkin();
